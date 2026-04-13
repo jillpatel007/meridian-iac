@@ -1,0 +1,14 @@
+# Terraform state (NEVER commit — contains secrets in plaintext)
+*.tfstate
+*.tfstate.*
+.terraform/
+.terraform.lock.hcl
+
+# Local variable files (may contain credentials)
+*.tfvars
+!example.tfvars
+
+# OS / editor
+.DS_Store
+.vscode/
+.idea/
