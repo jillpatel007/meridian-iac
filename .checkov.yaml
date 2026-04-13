@@ -2,11 +2,26 @@
 # Every skip requires a justification. Auditors read this file.
 
 skip-check:
-  # ---- Accepted as Not Applicable for training range ----
-  - CKV2_AWS_62   # S3 event notifications — requires business logic (Lambda/SNS triggers). N/A for training bucket.
-  - CKV2_AWS_61   # S3 lifecycle configuration — cost optimization concern, not security. N/A for short-lived training.
-  - CKV_AWS_144   # S3 cross-region replication — DR concern. Day 4 will address for Meridian prod data stores.
+  # ============================================================
+  # AWS
+  # ============================================================
+  # Accepted as Not Applicable for training range
+  - CKV2_AWS_62   # S3 event notifications — requires business logic. N/A for training.
+  - CKV2_AWS_61   # S3 lifecycle — cost concern, not security. N/A for short-lived.
+  - CKV_AWS_144   # S3 cross-region replication — DR concern. Day 4 addresses.
+  # Real findings scheduled for Day 4 (CIT-040)
+  - CKV_AWS_18    # S3 access logging — scheduled Day 4 harden-a-thon.
+  - CKV_AWS_145   # S3 KMS CMEK — scheduled Day 4 KMS sweep.
 
-  # ---- Real findings, scheduled for Day 4 hardening (CIT-040) ----
-  - CKV_AWS_18    # S3 access logging — LEGITIMATE. Scheduled: Day 4 "Harden-a-thon" (CIT-040).
-  - CKV_AWS_145   # S3 KMS CMEK encryption — LEGITIMATE. Scheduled: Day 4 KMS/CMEK sweep (CIT-040).
+  # ============================================================
+  # Azure
+  # ============================================================
+  # Real findings scheduled for Day 4 (CIT-040)
+  - CKV2_AZURE_1   # Storage CMEK — scheduled Day 4 KMS sweep.
+  - CKV2_AZURE_33  # Storage private endpoint — scheduled Day 4 network hardening.
+
+  # ============================================================
+  # GCP (likely — will be added as GCP findings surface)
+  # ============================================================
+  - CKV_GCP_78    # GCS CMEK — scheduled Day 4 KMS sweep.
+  - CKV_GCP_62    # GCS bucket logging — scheduled Day 4 harden-a-thon.
