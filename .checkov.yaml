@@ -5,23 +5,32 @@ skip-check:
   # ============================================================
   # AWS
   # ============================================================
-  # Accepted as Not Applicable for training range
-  - CKV2_AWS_62   # S3 event notifications — requires business logic. N/A for training.
-  - CKV2_AWS_61   # S3 lifecycle — cost concern, not security. N/A for short-lived.
-  - CKV_AWS_144   # S3 cross-region replication — DR concern. Day 4 addresses.
-  # Real findings scheduled for Day 4 (CIT-040)
-  - CKV_AWS_18    # S3 access logging — scheduled Day 4 harden-a-thon.
-  - CKV_AWS_145   # S3 KMS CMEK — scheduled Day 4 KMS sweep.
+  # Not Applicable for training range
+  - CKV2_AWS_62    # S3 event notifications — requires business logic. N/A for training.
+  - CKV2_AWS_61    # S3 lifecycle — cost optimization, not security. N/A for short-lived.
+  - CKV_AWS_144    # S3 cross-region replication — DR concern. Day 4.
+  # Scheduled for Day 4 (CIT-040)
+  - CKV_AWS_18     # S3 access logging — Day 4 harden-a-thon.
+  - CKV_AWS_145    # S3 KMS CMEK — Day 4 KMS sweep.
 
   # ============================================================
   # Azure
   # ============================================================
-  # Real findings scheduled for Day 4 (CIT-040)
-  - CKV2_AZURE_1   # Storage CMEK — scheduled Day 4 KMS sweep.
-  - CKV2_AZURE_33  # Storage private endpoint — scheduled Day 4 network hardening.
+  # Not Applicable for training range
+  - CKV_AZURE_33   # Queue service logging — we don't use Queues.
+  - CKV_AZURE_206  # Storage replication (GRS/ZRS) — DR concern, LRS chosen for cost.
+  - CKV2_AZURE_41  # SAS expiration policy — we don't use SAS tokens.
+  # Scheduled for Day 4 (CIT-040)
+  - CKV_AZURE_59   # Disallow public network access — Day 4 flips, adds Private Endpoint.
+  - CKV_AZURE_38   # Blob soft-delete — Day 4 harden-a-thon.
+  - CKV_AZURE_40   # Disable Shared Key auth — Day 4 disables, Day 2 attacks require it.
+  - CKV2_AZURE_1   # Storage CMEK — Day 4 KMS sweep.
+  - CKV2_AZURE_33  # Storage private endpoint — Day 4 network hardening.
 
   # ============================================================
-  # GCP (likely — will be added as GCP findings surface)
+  # GCP
   # ============================================================
-  - CKV_GCP_78    # GCS CMEK — scheduled Day 4 KMS sweep.
-  - CKV_GCP_62    # GCS bucket logging — scheduled Day 4 harden-a-thon.
+  # Scheduled for Day 4 (CIT-040)
+  - CKV_GCP_78     # GCS CMEK — Day 4 KMS sweep.
+  - CKV_GCP_62     # GCS bucket logging — Day 4 harden-a-thon.
+  - CKV_GCP_114    # GCS uniform bucket-level access — ensure this is correctly identified if flagged.
