@@ -6,15 +6,17 @@ on:
   pull_request:
     branches: [main]
 
+permissions:
+  contents: read
+  id-token: write  # required for Cosign keyless OIDC
+
 jobs:
   tfsec:
     name: tfsec — Terraform security scan
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      - name: Run tfsec
-        uses: aquasecurity/tfsec-action@v1.0.3
+      - uses: actions/checkout@v4
+      - uses: aquasecurity/tfsec-action@v1.0.3
         with:
           soft_fail: false
 
@@ -22,10 +24,8 @@ jobs:
     name: Checkov — multi-framework scan
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      - name: Run Checkov
-        uses: bridgecrewio/checkov-action@master
+      - uses: actions/checkout@v4
+      - uses: bridgecrewio/checkov-action@master
         with:
           directory: .
           framework: terraform
@@ -36,10 +36,8 @@ jobs:
     name: Terrascan — OPA policy scan
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      - name: Run Terrascan
-        uses: tenable/terrascan-action@main
+      - uses: actions/checkout@v4
+      - uses: tenable/terrascan-action@main
         with:
           iac_type: terraform
           iac_dir: .
@@ -49,10 +47,8 @@ jobs:
     name: Trivy — misconfig + secrets scan
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      - name: Run Trivy
-        uses: aquasecurity/trivy-action@master
+      - uses: actions/checkout@v4
+      - uses: aquasecurity/trivy-action@master
         with:
           scan-type: config
           scan-ref: .
@@ -63,29 +59,45 @@ jobs:
     name: Conftest — Meridian custom policies
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
-
-      - name: Convert Terraform to JSON
-        run: |
-          for dir in aws azure gcp; do
-            cd $dir
-            terraform init -backend=false
-            terraform plan -out=tfplan.binary || true
-            terraform show -json tfplan.binary > tfplan.json 2>/dev/null || terraform show -json > tfplan.json
-            cd ..
-          done
-        continue-on-error: true
-
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
       - name: Install Conftest
         run: |
-          wget https://github.com/open-policy-agent/conftest/releases/download/v0.50.0/conftest_0.50.0_Linux_x86_64.tar.gz
+          wget -q https://github.com/open-policy-agent/conftest/releases/download/v0.50.0/conftest_0.50.0_Linux_x86_64.tar.gz
           tar xzf conftest_0.50.0_Linux_x86_64.tar.gz
           sudo mv conftest /usr/local/bin/
+      - name: Run Conftest
+        run: conftest test --policy policies/ aws/main.tf azure/main.tf gcp/main.tf --parser hcl2
 
-      - name: Run Conftest against Terraform HCL
+  sign:
+    name: Cosign — keyless sign Terraform modules
+    runs-on: ubuntu-latest
+    needs: [tfsec, checkov, terrascan, trivy, conftest]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Cosign
+        uses: sigstore/cosign-installer@v3
+
+      - name: Create Terraform bundle
         run: |
-          conftest test --policy policies/ aws/main.tf azure/main.tf gcp/main.tf --parser hcl2
+          tar czf meridian-iac-bundle.tar.gz aws/ azure/ gcp/ policies/
+          sha256sum meridian-iac-bundle.tar.gz > bundle.sha256
+
+      - name: Sign bundle with Cosign (keyless OIDC)
+        run: |
+          cosign sign-blob --yes \
+            --output-signature meridian-iac-bundle.sig \
+            --output-certificate meridian-iac-bundle.cert \
+            meridian-iac-bundle.tar.gz
+
+      - name: Upload signed artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: meridian-iac-signed
+          path: |
+            meridian-iac-bundle.tar.gz
+            meridian-iac-bundle.sig
+            meridian-iac-bundle.cert
+            bundle.sha256
