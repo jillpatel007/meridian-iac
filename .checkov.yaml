@@ -22,8 +22,8 @@ skip-check:
   - CKV2_AZURE_41  # SAS expiration policy — we don't use SAS tokens.
   # Scheduled for Day 4 (CIT-040)
   - CKV_AZURE_59   # Disallow public network access — Day 4 flips, adds Private Endpoint.
-  - CKV_AZURE_38   # Blob soft-delete — Day 4 harden-a-thon.
-  - CKV_AZURE_40   # Disable Shared Key auth — Day 4 disables, Day 2 attacks require it.
+  - CKV2_AZURE_38   # Blob soft-delete — Day 4 harden-a-thon.
+  - CKV2_AZURE_40   # Disable Shared Key auth — Day 4 disables, Day 2 attacks require it.
   - CKV2_AZURE_1   # Storage CMEK — Day 4 KMS sweep.
   - CKV2_AZURE_33  # Storage private endpoint — Day 4 network hardening.
 
