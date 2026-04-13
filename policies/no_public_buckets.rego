@@ -1,12 +1,14 @@
 package meridian.buckets
 
-# Fail if AWS S3 bucket public access block has any knob set to false.
+# List of the four Block Public Access knobs we require to be true.
+required_knobs := ["block_public_acls", "block_public_policy", "ignore_public_acls", "restrict_public_buckets"]
+
+# Fail if any AWS S3 bucket public access block has any knob set to false.
 deny[msg] {
   resource := input.resource.aws_s3_bucket_public_access_block[name]
-  some knob
-  knob := ["block_public_acls", "block_public_policy", "ignore_public_acls", "restrict_public_buckets"][_]
-  resource[knob] == false
-  msg := sprintf("AWS S3 PublicAccessBlock '%s' has %s=false — Meridian policy requires all four to be true.", [name, knob])
+  k := required_knobs[_]
+  resource[k] == false
+  msg := sprintf("AWS S3 PublicAccessBlock '%s' has %s=false — Meridian policy requires all four to be true.", [name, k])
 }
 
 # Fail if Azure Storage Account allows public blob access.
