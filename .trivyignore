@@ -1,0 +1,17 @@
+# Trivy misconfig skips with documented reasoning.
+# Scheduled under Day 4 hardening ticket CIT-040.
+
+# ---- Azure Storage Account ----
+AVD-AZU-0012   # Storage account public network access — Day 4 flips to false + Private Endpoint
+AVD-AZU-0010   # Storage account CMEK encryption — Day 4 KMS sweep
+AVD-AZU-0011   # Shared key auth enabled — Day 4 disables, Day 2 attacks require it
+AVD-AZU-0008   # Queue service logging — N/A, we don't use Queues
+AVD-AZU-0009   # Blob service logging — Day 4 harden-a-thon
+
+# ---- AWS S3 ----
+AVD-AWS-0089   # S3 access logging — Day 4 harden-a-thon
+AVD-AWS-0132   # S3 KMS CMEK encryption — Day 4 KMS sweep
+
+# ---- GCP GCS ----
+AVD-GCP-0066   # GCS CMEK — Day 4 KMS sweep
+AVD-GCP-0001   # GCS logging — Day 4 harden-a-thon
