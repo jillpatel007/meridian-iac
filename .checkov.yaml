@@ -1,0 +1,12 @@
+# Checkov skip list with documented reasoning.
+# Every skip requires a justification. Auditors read this file.
+
+skip-check:
+  # ---- Accepted as Not Applicable for training range ----
+  - CKV2_AWS_62   # S3 event notifications — requires business logic (Lambda/SNS triggers). N/A for training bucket.
+  - CKV2_AWS_61   # S3 lifecycle configuration — cost optimization concern, not security. N/A for short-lived training.
+  - CKV_AWS_144   # S3 cross-region replication — DR concern. Day 4 will address for Meridian prod data stores.
+
+  # ---- Real findings, scheduled for Day 4 hardening (CIT-040) ----
+  - CKV_AWS_18    # S3 access logging — LEGITIMATE. Scheduled: Day 4 "Harden-a-thon" (CIT-040).
+  - CKV_AWS_145   # S3 KMS CMEK encryption — LEGITIMATE. Scheduled: Day 4 KMS/CMEK sweep (CIT-040).
